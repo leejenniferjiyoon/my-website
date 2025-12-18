@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <title>Jennifer Jiyoon Lee</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;400&display=swap" rel="stylesheet">
   <style>
     html, body, #root {
       margin: 0;
@@ -13,7 +16,8 @@
 
     body {
       background-color: #FDFDFD;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      /* Changed to Montserrat */
+      font-family: 'Montserrat', sans-serif;
     }
 
     .app-root {
@@ -29,9 +33,11 @@
       top: 2rem;
       left: 2rem;
       pointer-events: none;
-      font-weight: 700;
+      font-weight: 100;
       font-size: 1.5rem;
       color: #1f2933;
+      /* Added tracking for a cleaner thin look */
+      letter-spacing: 0.05em;
     }
 
     .bdp-instruction {
@@ -41,7 +47,11 @@
       pointer-events: none;
       font-size: 0.7rem;
       color: #9CA3AF;
-      font-family: "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      /* Changed from SF Mono to Montserrat */
+      font-family: 'Montserrat', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 200;
     }
 
     .overlay-backdrop {
@@ -66,8 +76,9 @@
 
     .overlay-title {
       font-size: 1.25rem;
-      font-weight: 600;
+      font-weight: 200;
       margin-bottom: 0.75rem;
+      
     }
 
     .overlay-image {
