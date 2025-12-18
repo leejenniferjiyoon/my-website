@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Jennifer Jiyoon Lee</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    html, body, #root {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+
+    body {
+      background-color: #FDFDFD;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    .app-root {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      cursor: none;
+    }
+
+    .bdp-title {
+      position: absolute;
+      top: 2rem;
+      left: 2rem;
+      pointer-events: none;
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: #1f2933;
+    }
+
+    .bdp-instruction {
+      position: absolute;
+      right: 1.5rem;
+      bottom: 1.5rem;
+      pointer-events: none;
+      font-size: 0.7rem;
+      color: #9CA3AF;
+      font-family: "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    .overlay-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+
+    .overlay-card {
+      background: white;
+      max-width: 640px;
+      width: 100%;
+      margin: 0 1rem;
+      padding: 1.5rem;
+      border-radius: 0.75rem;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    }
+
+    .overlay-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+
+    .overlay-image {
+      width: 100%;
+      max-height: 18rem;
+      object-fit: contain;
+      border-radius: 0.01rem;
+      margin-bottom: 1rem;
+    }
+
+    .overlay-text {
+      font-size: 0.9rem;
+      line-height: 1.4;
+      color: #374151;
+      white-space: pre-line;
+    }
+
+    .overlay-button {
+      margin-top: 1rem;
+      padding: 0.4rem 1rem;
+      font-size: 0.8rem;
+      font-weight: 500;
+      border-radius: 999px;
+      border: none;
+      color: white;
+      background: black;
+      cursor: pointer;
+    }
+
+    .overlay-button:hover {
+      background: #111827;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- React + Babel CDN (no build tools required) -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- Your app code -->
+  <script type="text/babel">
+    const { useState, useEffect, useRef, useCallback } = React;
+
+    // === ASSET PATHS (NO LEADING SLASH, FILES MUST BE NEXT TO index.html) ===
+    const ASSETS = {
+      pianos: 'ASSETS/bdp_pianos.png',
+      rash: 'ASSETS/bdp_rash.png',
+      moodring: 'ASSETS/BDP_MOODRING.png',
+      jade: 'ASSETS/bdpXjade.png',       // renamed file
+      bdp23: 'ASSETS/blackletter.png',       // renamed file
+
+      eye: 'ASSETS/bdpeye.png',
+      rooftop: 'ASSETS/bdp_rooftop.png',
+      mansions: 'ASSETS/bdpmansions.png',
+      funpackage: 'ASSETS/package1.png',
+      funtwopackage: 'ASSETS/package2.png',
+      copiapackage: 'ASSETS/copiapackage.png',
+      perfume: 'ASSETS/perfume.png',
+      me: 'ASSETS/facecard.png',
+      fuck: 'ASSETS/fuck.png',
+      mib: 'ASSETS/meninblack.png',
+      skies: 'ASSETS/skies.png',
+      woman: 'ASSETS/wom.png',
+      clock: 'ASSETS/clockout.png',
+      fujione: 'ASSETS/fujibar.png',
+      fujitwo: 'ASSETS/fujigraphic.png',
+
+      tree: 'ASSETS/piedmont.png',
+      dot: 'ASSETS/sekse.png',
+      lines: 'ASSETS/MIFalbumbyclementine.png',
+      figure: 'ASSETS/saborami.png',
+      face: 'ASSETS/shotyalb.png',
+      lips: 'ASSETS/album3.png',
+
+      rubyone: 'ASSETS/ruby1.png',
+      rubytwo: 'ASSETS/ruby2.png',
+      rubythree: 'ASSETS/ruby3.png',
+      rubyfour: 'ASSETS/ruby4.png',
+      rubyfive: 'ASSETS/ruby5.png',
+      rubysix: 'ASSETS/ruby6.png',
+
+      chair: 'ASSETS/chair.png',
+      lamp: 'ASSETS/lamp.png',
+    };
+
+    const LINES = [
+      {
+        id: 'line-1-brown-top-left',
+        x1: 12, y1: 15,
+        x2: 78, y2: 88,
+        color: '#8B5E56',
+        images: [ASSETS.pianos, ASSETS.moodring, ASSETS.bdp23],
+      },
+      {
+        id: 'line-2-pink-steep',
+        x1: 18, y1: 8,
+        x2: 36, y2: 95,
+        color: '#FF6B9D',
+        images: [ASSETS.rash, ASSETS.jade, ASSETS.mansions],
+      },
+      {
+        id: 'line-3-cyan-cross',
+        x1: 12, y1: 45,
+        x2: 66, y2: 86,
+        color: '#00FFFF',
+        images: [ASSETS.eye, ASSETS.rooftop],
+      },
+      {
+        id: 'line-4-purple-steep',
+        x1: 28, y1: 9,
+        x2: 40, y2: 95,
+        color: '#9FA2D6',
+        images: [
+          ASSETS.tree,
+          ASSETS.dot,
+          ASSETS.lines,
+          ASSETS.figure,
+          ASSETS.face,
+          ASSETS.lips
+        ],
+      },
+      {
+        id: 'line-5-orange-vertical',
+        x1: 47, y1: 11,
+        x2: 48, y2: 92,
+        color: '#FFB38A',
+        images: [ASSETS.chair, ASSETS.lamp, ASSETS.clock],
+      },
+      {
+        id: 'line-6-green-steep-up',
+        x1: 52, y1: 96,
+        x2: 58, y2: 4,
+        color: '#66FFB2',
+        images: [ASSETS.funpackage, ASSETS.funtwopackage, ASSETS.copiapackage, ASSETS.perfume],
+      },
+      {
+        id: 'line-7-pink-right',
+        x1: 65, y1: 17,
+        x2: 71, y2: 96,
+        color: '#FF6B9D',
+        images: [ASSETS.me, ASSETS.fuck, ASSETS.mib, ASSETS.skies, ASSETS.woman],
+      },
+      {
+        id: 'line-8-brown-right',
+        x1: 69, y1: 24,
+        x2: 82, y2: 94,
+        color: '#8B5E56',
+        images: [ ASSETS.fujione, ASSETS.fujitwo],
+      },
+      {
+        id: 'line-9-purple-far-right',
+        x1: 78, y1: 96,
+        x2: 88, y2: 5,
+        color: '#9FA2D6',
+        images: [ASSETS.rubyone, ASSETS.rubythree, ASSETS.rubyfour, ASSETS.rubyfive, ASSETS.rubysix ],
+      },
+    ];
+
+    // === TEXT TEMPLATE FOR EACH IMAGE ===
+    const IMAGE_INFO = {
+      [ASSETS.pianos]: {
+        title: 'BUSHWICK DOMESTIC PRODUCT',
+        description: `marketing/branding design for a brooklyn based DJ collective's socials and events.`,
+      },
+      [ASSETS.rash]: {
+        title: 'BUSHWICK DOMESTIC PRODUCT',
+        description: `marketing/branding design for a brooklyn based DJ collective's socials and events.`,
+      },
+      [ASSETS.moodring]: {
+        title: 'BUSHWICK DOMESTIC PRODUCT',
+        description: `marketing/branding design for a brooklyn based DJ collective's socials and events.`,
+      },
+      [ASSETS.jade]: {
+        title: 'BUSHWICK DOMESTIC PRODUCT',
+        description: `marketing/branding design for a brooklyn based DJ collective's socials and events.`,
+      },
+      [ASSETS.bdp23]: {
+        title: 'BUSHWICK DOMESTIC PRODUCT',
+        description: `marketing/branding design for a brooklyn based DJ collective's socials and events.`,
+      },
+      [ASSETS.eye]: {
+        title: 'BUSHWICK DOMESTIC PRODUCT',
+        description: `marketing/branding design for a brooklyn based DJ collective's socials and events.`,
+      },
+      [ASSETS.rooftop]: {
+        title: 'BUSHWICK DOMESTIC PRODUCT',
+        description: `marketing/branding design for a brooklyn based DJ collective's socials and events.`,
+      },
+      [ASSETS.mansions]: {
+        title: 'BUSHWICK DOMESTIC PRODUCT',
+        description: `marketing/branding design for a brooklyn based DJ collective's socials and events.`,
+      },
+      [ASSETS.tree]: {
+        title: 'GRAPHIC DESIGN:)',
+        description: `my digital perception of piedmont park in atlanta, GA.`,
+      },
+      [ASSETS.dot]: {
+        title: 'ALBUM DESIGN:)',
+        description: `album cover design (for fun) inspired by the "Made In France" album by french aritst Clementine.`,
+      },
+      [ASSETS.lines]: {
+        title: 'ALBUM DESIGN:)',
+        description: `album cover design (for fun) inspired by the "Made In France" album by french aritst Clementine.`,
+      },
+      [ASSETS.figure]: {
+        title: 'ALBUM DESIGN',
+        description: `album cover design (for fun) inspired by the "Made In France" album by french aritst Clementine.`,
+      },
+      [ASSETS.face]: {
+        title: 'ALBUM DESIGN',
+        description: `album cover art for an ATL based artist, SHOTY.`,
+      },
+      [ASSETS.lips]: {
+        title: 'ALBUM DESIGN',
+        description: `album cover art for an ATL based artist, SHOTY.`,
+      },
+      [ASSETS.chair]: {
+        title: 'FURNITURE DESIGN',
+        description: `chair design inspired by wings of a dove and shape of hanging curtains: "nalgae".`,
+      },
+      [ASSETS.lamp]: {
+        title: 'LAMP DESIGN',
+        description: `lamp design inspired by musical vinyl records. for all the jazz lovers.`,
+      },
+      [ASSETS.funpackage]: {
+        title: 'PACKAGING',
+        description: `packaging design for rings.`,
+      },
+      [ASSETS.funtwopackage]: {
+        title: 'PACKAGING',
+        description: `packaging design for earrings.`,
+      },
+      [ASSETS.copiapackage]: {
+        title: 'PACKAGING',
+        description: `film roll packaging design for ATL based music record label, COPIA.`,
+      },
+      [ASSETS.perfume]: {
+        title: 'PACKAGING',
+        description: `packaging design for perfumes.`,
+      },
+      [ASSETS.me]: {
+        title: 'FOR FUN',
+        description: ` title: facecard `,
+      },
+      [ASSETS.mib]: {
+        title: 'FOR FUN',
+        description: ` title: meninblack `,
+      },
+      [ASSETS.fuck]: {
+        title: 'FOR FUN',
+        description: ` title: birthdays `,
+      },
+      [ASSETS.skies]: {
+        title: 'FOR FUN',
+        description: ` title: goodbye `,
+      },
+      [ASSETS.woman]: {
+        title: 'FOR FUN',
+        description: ` title: sexi `,
+      },
+      [ASSETS.clock]: {
+        title: 'FURNITURE DESIGN',
+        description: ` an imaginary clock `,
+      },
+      [ASSETS.fujione]: {
+        title: 'BRANDING/MARKETING',
+        description: ` branding and marketing design for NYC based lifestyle/protein bar company, FUJI `,
+      },
+      [ASSETS.fujitwo]: {
+        title: 'BRANDING/MARKETING',
+        description: ` branding and marketing design for NYC based lifestyle/protein bar company, FUJI `,
+      },
+      [ASSETS.rubyone]: {
+        title: 'BRANDING/MARKETING',
+        description: ` branding and marketing design for NYC based beverage company, RUBY HIBISCUS WATER`,
+      },
+      [ASSETS.rubytwo]: {
+        title: 'BRANDING/MARKETING',
+        description: ` branding and marketing design for NYC based beverage company, RUBY HIBISCUS WATER`,
+      },
+      [ASSETS.rubythree]: {
+        title: 'BRANDING/MARKETING',
+        description: ` branding and marketing design for NYC based beverage company, RUBY HIBISCUS WATER`,
+      },
+      [ASSETS.rubyfour]: {
+        title: 'BRANDING/MARKETING',
+        description: ` branding and marketing design for NYC based beverage company, RUBY HIBISCUS WATER`,
+      },
+      [ASSETS.rubyfive]: {
+        title: 'BRANDING/MARKETING',
+        description: ` branding and marketing design for NYC based beverage company, RUBY HIBISCUS WATER`,
+      },
+      [ASSETS.rubysix]: {
+        title: 'BRANDING/MARKETING',
+        description: ` branding and marketing design for NYC based beverage company, RUBY HIBISCUS WATER`,
+      },
+
+    };
+
+    function InteractiveLine({ line, onHoverChange }) {
+      const lineRef = useRef(null);
+
+      const handleMouseMove = useCallback((e) => {
+        if (!lineRef.current) return;
+        const svgElement = lineRef.current.ownerSVGElement;
+        if (!svgElement) return;
+
+        const pt = svgElement.createSVGPoint();
+        pt.x = e.clientX;
+        pt.y = e.clientY;
+
+        const ctm = svgElement.getScreenCTM();
+        if (!ctm) return;
+
+        const svgP = pt.matrixTransform(ctm.inverse());
+
+        const x1 = line.x1;
+        const y1 = line.y1;
+        const x2 = line.x2;
+        const y2 = line.y2;
+
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        const dpx = svgP.x - x1;
+        const dpy = svgP.y - y1;
+
+        const lenSq = dx * dx + dy * dy;
+        if (lenSq === 0) return;
+
+        let t = (dpx * dx + dpy * dy) / lenSq;
+        t = Math.max(0, Math.min(1, t));
+
+        const imageCount = line.images.length;
+        if (imageCount === 0) {
+          onHoverChange(false, null, 0, 0);
+          return;
+        }
+
+        let imageIndex = Math.floor(t * imageCount);
+        if (imageIndex >= imageCount) imageIndex = imageCount - 1;
+
+        const selectedImage = line.images[imageIndex];
+        onHoverChange(true, selectedImage, e.clientX, e.clientY);
+      }, [line, onHoverChange]);
+
+      const handleMouseLeave = useCallback(() => {
+        onHoverChange(false, null, 0, 0);
+      }, [onHoverChange]);
+
+      const handleMouseEnter = useCallback((e) => {
+        handleMouseMove(e);
+      }, [handleMouseMove]);
+
+      return (
+        <g>
+          <line
+            ref={lineRef}
+            x1={line.x1}
+            y1={line.y1}
+            x2={line.x2}
+            y2={line.y2}
+            stroke="transparent"
+            strokeWidth={10}
+            style={{ cursor: 'none' }}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+            onMouseEnter={handleMouseEnter}
+          />
+          <line
+            x1={line.x1}
+            y1={line.y1}
+            x2={line.x2}
+            y2={line.y2}
+            stroke={line.color}
+            strokeWidth={0.6}
+            strokeLinecap="round"
+            className="pointer-events-none"
+          />
+        </g>
+      );
+    }
+
+    function FloatingImage({ src, x, y, isVisible, onImageClick }) {
+      const [smoothX, setSmoothX] = useState(x);
+      const [smoothY, setSmoothY] = useState(y);
+
+      useEffect(() => {
+        setSmoothX(x);
+        setSmoothY(y);
+      }, [x, y]);
+
+      if (!src) return null;
+
+      const outerStyle = {
+        position: 'fixed',
+        left: smoothX,
+        top: smoothY,
+        transform: 'translate(-50%, -50%)',
+        pointerEvents: 'none',
+        zIndex: 40,
+        opacity: isVisible ? 1 : 0,
+        transition: 'opacity 0.2s ease-out',
+      };
+
+      const innerStyle = {
+        position: 'relative',
+        pointerEvents: 'none',
+        cursor: 'default',
+      };
+
+      const imgStyle = {
+        maxWidth: '450px',
+        maxHeight: '600px',
+        objectFit: 'contain',
+        boxShadow: '0 25px 50px rgba(0,0,0,0.4)',
+        borderRadius: '2px',
+        border: '2px solid white',
+        backgroundColor: 'white',
+      };
+
+      return (
+        <div style={outerStyle}>
+          <div
+            style={innerStyle}
+          >
+            <img src={src} alt="Portfolio Preview" style={imgStyle} />
+          </div>
+        </div>
+      );
+    }
+
+    function CustomCursor({ x, y }) {
+      const outer = {
+        position: 'fixed',
+        left: x,
+        top: y,
+        transform: 'translate(-50%, -50%)',
+        pointerEvents: 'none',
+        zIndex: 50,
+      };
+      const dot = {
+        width: '10px',
+        height: '10px',
+        borderRadius: '999px',
+        backgroundColor: '#ec4899', // pink-500
+      };
+      return (
+        <div style={outer}>
+          <div style={dot} />
+        </div>
+      );
+    }
+
+    function ImageInfoOverlay({ isOpen, imageSrc, title, description, onClose }) {
+  if (!isOpen) return null;
+
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: 'fixed',
+        inset: 0,
+        background: 'rgba(0,0,0,0.6)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 9999,
+        pointerEvents: 'auto',
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: 'white',
+          width: 'min(680px, 92vw)',
+          padding: '24px',
+          borderRadius: '14px',
+          boxShadow: '0 20px 50px rgba(0,0,0,0.25)',
+        }}
+      >
+        <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 600 }}>
+          {title || 'Untitled work'}
+        </h2>
+
+        {imageSrc && (
+          <img
+            src={imageSrc}
+            alt={title || 'Untitled work'}
+            style={{
+              width: '100%',
+              maxHeight: '320px',
+              objectFit: 'contain',
+              marginTop: '12px',
+              borderRadius: '10px',
+            }}
+          />
+        )}
+
+        <p style={{ whiteSpace: 'pre-line', marginTop: '12px', color: '#374151' }}>
+          {description || 'No description yet.'}
+        </p>
+
+        <button
+          onClick={onClose}
+          style={{
+            marginTop: '14px',
+            padding: '8px 14px',
+            borderRadius: '999px',
+            border: 'none',
+            background: 'black',
+            color: 'white',
+            cursor: 'pointer',
+          }}
+        >
+          close
+        </button>
+      </div>
+    </div>
+  );
+}
+
+
+    function App() {
+      const [hoverState, setHoverState] = useState({
+        isVisible: false,
+        imageSrc: null,
+        x: 0,
+        y: 0,
+      });
+
+      const [cursor, setCursor] = useState({ x: 0, y: 0 });
+
+      const [overlay, setOverlay] = useState({
+        isOpen: false,
+        imageSrc: null,
+        title: '',
+        description: '',
+      });
+
+      // Close overlay with ESC
+      useEffect(() => {
+        const onKeyDown = (e) => {
+          if (e.key === 'Escape') {
+            handleCloseOverlay();
+          }
+        };
+        window.addEventListener('keydown', onKeyDown);
+        return () => window.removeEventListener('keydown', onKeyDown);
+      }, []);
+
+      const handleHoverChange = (isVisible, imageSrc, x, y) => {
+        if (overlay.isOpen) return;
+        setHoverState({
+          isVisible,
+          imageSrc,
+          x,
+          y,
+        });
+      };
+
+      const handleRootMouseMove = (e) => {
+        setCursor({ x: e.clientX, y: e.clientY });
+      };
+      const handleRootMouseDown = (e) => {
+        if (overlay.isOpen) {
+          handleCloseOverlay();
+          e.stopPropagation();
+          return;
+        }
+
+        if (hoverState.isVisible && hoverState.imageSrc) {
+    handleImageClick(hoverState.imageSrc);
+  }
+};
+
+      const normalizeKey = (s) => {
+  // If s is already "ASSETS/xyz.png", returns it unchanged.
+  // If s is a full URL or file path, tries to reduce it to "ASSETS/xyz.png".
+  try {
+    const u = new URL(s, window.location.href);
+    const path = u.pathname; // e.g. /Users/.../BDP-portfolio/ASSETS/bdp_pianos.png
+    const idx = path.lastIndexOf('/ASSETS/');
+    if (idx !== -1) return 'ASSETS/' + path.slice(idx + '/ASSETS/'.length);
+    return s;
+  } catch {
+    return s;
+  }
+};
+      const handleImageClick = (imageSrc) => {
+        const key = normalizeKey(imageSrc);
+
+        // IMPORTANT: look up by the normalized key so it works both locally and on Vercel
+        const info = IMAGE_INFO[key] || IMAGE_INFO[imageSrc] || {
+          title: 'Untitled work',
+          description: 'No description yet.',
+        };
+
+        setOverlay({
+          isOpen: true,
+          imageSrc: key,
+          title: info.title,
+          description: info.description,
+        });
+
+        // freeze the hover image immediately when the overlay opens
+        setHoverState({ isVisible: false, imageSrc: null, x: 0, y: 0 });
+      };
+
+      const handleCloseOverlay = () => {
+        setOverlay((prev) => ({ ...prev, isOpen: false }));
+        setHoverState({ isVisible: false, imageSrc: null, x: 0, y: 0 });
+      };
+
+      return (
+        <div
+          className="app-root"
+          onMouseMove={handleRootMouseMove}
+          onMouseDown={handleRootMouseDown}
+        >
+          <svg
+            className="bdp-svg"
+            style={{
+              width: '100%',
+              height: '100%',
+              position: 'absolute',
+              inset: 0,
+              pointerEvents: overlay.isOpen ? 'none' : 'auto',
+            }}
+            viewBox="0 0 100 100" 
+            preserveAspectRatio="none"
+          >
+            {LINES.map((line) => (
+              <InteractiveLine
+                key={line.id}
+                line={line}
+                onHoverChange={handleHoverChange}
+              />
+            ))}
+          </svg>
+
+          <FloatingImage
+            src={hoverState.imageSrc}
+            x={hoverState.x}
+            y={hoverState.y}
+            isVisible={hoverState.isVisible && !overlay.isOpen}
+            onImageClick={handleImageClick}
+          />
+
+          <div className="bdp-title">
+            Jennifer Jiyoon Lee
+          </div>
+
+          <div className="bdp-instruction">
+            glide to explore
+          </div>
+
+          <CustomCursor x={cursor.x} y={cursor.y} />
+
+          <ImageInfoOverlay
+            isOpen={overlay.isOpen}
+            imageSrc={overlay.imageSrc}
+            title={overlay.title}
+            description={overlay.description}
+            onClose={handleCloseOverlay}
+          />
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
